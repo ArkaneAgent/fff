@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <title>Flick - Trenches Aim Trainer</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&amp;display=swap" rel="stylesheet">
+    <!-- Inlined CSS (replaces external CSS file) -->
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100%; /* Allow full document height */
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body {
+            font-family: 'ROM Regular', 'SF Pro Display', -apple-system, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            padding: 40px 40px 20px;
+            background: #000000;
+            border-bottom: 1px solid #1a1a1a;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 1280px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.4em;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .twitter-link {
+            color: #a1a1a1;
+            font-size: 1.1em;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            margin-left: 20px;
+        }
+
+        .twitter-link:hover {
+            color: #ffffff;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            background: linear-gradient(#000000 0%, #1a1a1a 100%);
+        }
+
+        /* Aim Trainer */
+        .aim-trainer {
+            padding: 60px 20px;
+            background: #000000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-wrapper {
+            position: relative;
+            margin: 0 auto;
+            width: 800px;
+            max-width: 90vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            cursor: crosshair;
+            background: #171717;
+            border-radius: 20px;
+            border: 1px solid #2a2a2a;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .hud {
+            width: calc(100% - 40px);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 12px 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            display: none;
+            justify-content: space-between;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            font-size: 15px;
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            color: #a1a1a1;
+        }
+
+        .stats div {
+            margin-right: 12px;
+        }
+
+        .start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #171717;
+            padding: 40px 50px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 2000;
+            width: 80%;
+            max-width: 500px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .start-screen h1 {
+            font-size: 2em;
+            color: #ffffff;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .start-screen p {
+            color: #a1a1a1;
+            margin-bottom: 20px;
+            font-weight: 400;
+        }
+
+        .start-screen hr {
+            width: 60%;
+            margin: 20px auto;
+            border-color: #2a2a2a;
+        }
+
+        .start-button {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        .start-button:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+        }
+
+        .game-over {
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+            background: #171717;
+            border-radius: 15px;
+            border: 1px solid #2a2a2a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .game-over h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .game-over h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .game-over hr {
+            margin: 15px 0;
+            border-color: #2a2a2a;
+        }
+
+        .game-over p {
+            font-size: 1em;
+            margin: 5px 0;
+        }
+
+        .target-button {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 100px;
+            height: 36px;
+            padding: 8px 12px;
+            background: #2a2a2a;
+            color: #ffffff;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            transition: background-color 0.2s, transform 0.2s;
+            transform-origin: center;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .target-button:hover {
+            background: #3a3a2a;
+            transform: scale(1.05);
+        }
+
+        .target-button.clicked {
+            transform: scale(0.9);
+            opacity: 0.6;
+        }
+
+        .lightning-icon, .solana-logo {
+            width: 12px !important;
+            height: 12px !important;
+            flex-shrink: 0;
+        }
+
+        .button-text {
+            color: #ffffff;
+            margin: 0;
+            font-size: 14px;
+            flex-shrink: 0;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .score-popup {
+            animation: float-up 1s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% { transform: translate(-50%, -100%); opacity: 1; }
+            100% { transform: translate(-50%, -150%); opacity: 0; }
+        }
+
+        /* Info Sections */
+        .info-sections {
+            padding: 80px 20px 120px;
+            background: #000000;
+            position: relative;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 3.2em;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #a1a1a1;
+            margin-bottom: 50px;
+            font-weight: 400;
+        }
+
+        .why-flick h3, .platforms h3, .tips h3 {
+            font-size: 2em;
+            color: #ffffff;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .reasons-grid, .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px 40px;
+            margin-bottom: 60px;
+        }
+
+        .reason-card, .platform-card {
+            background: #171717;
+            padding: 25px 30px;
+            border-radius: 16px;
+            text-align: left;
+            border: 1px solid #2a2a2a;
+            transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .reason-card::before, .platform-card::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: -15%;
+            width: 130%;
+            height: 130%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 80%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .reason-card:hover, .platform-card:hover {
+            transform: translateY(-5px);
+            background: #202020;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .reason-card h4, .platform-card h4 {
+            font-size: 1.5em;
+            color: #ffffff;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .reason-card p, .platform-card p {
+            color: #a1a1a1;
+            font-size: 1em;
+            font-weight: 400;
+        }
+
+        .tips ul {
+            list-style: none;
+            padding: 0;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .tips li {
+            padding: 12px 0;
+            color: #a1a1a1;
+            font-size: 1.1em;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tips li::before {
+            content: '→';
+            color: #ffffff;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+
+        .tips li:hover {
+            color: #ffffff;
+        }
+
+        .footer-message {
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .footer-message h2 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .footer-message p {
+            font-size: 1.2em;
+            color: #a1a1a1;
+            font-weight: 400;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .game-container { height: 400px; }
+            .stats { font-size: 14px; }
+            .start-screen { padding: 20px; width: 85%; }
+            .header-content { flex-direction: column; gap: 15px; }
+            h2 { font-size: 2.4em; }
+        }
+    </style>
+</head>
+<body>
+    <!--  Noise Canvas  -->
+    <canvas id="noiseCanvas" style="position: fixed; top: 0; left: 0; width: 100vw; z-index: 9999; pointer-events: none;"></canvas>
+
+    <!--  Header  -->
+    <header class="header">
+        <media-item class="" disable-zoom="true" hash="F2236081847320248123395471002298" limit-by="fit" scale="9"></media-item>
+        <div class="header-content">
+            <a class="twitter-link" href="https://x.com/flicktrainer" target="_blank">
+                Flick Twitter
+            </a>
+        </div>
+    </header>
+
+    <!--  Main Content  -->
+    <main class="main-content">
+        <!--  Aim Trainer Section  -->
+        <section class="aim-trainer">
+            <div class="game-wrapper">
+                <div class="hud">
+                    <div class="stats">
+                        <div>Score: <span id="score">0</span> SOL</div>
+                        <div>Time: <span id="time">20</span>s</div>
+                        <div>Accuracy: <span id="accuracy">0</span>%</div>
+                        <div>Hits: <span id="hits">0</span></div>
+                        <div>Misses: <span id="misses">0</span></div>
+                    </div>
+                </div>
+                <div class="game-container" id="gameContainer">
+                    <div class="start-screen" id="startScreen">
+                        <h1>Flick Aim Trainer</h1>
+                        <p>Click Quick Buy Fast.</p>
+                        <hr>
+                        <button class="start-button" id="startButton">Start</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!--  Info Sections  -->
+        <section class="info-sections">
+            <div class="container">
+                <h2>Your Only Weapon.</h2>
+                <p class="subtitle">First click, first TX.</p>
+
+                <!--  Why flick  -->
+                <div class="why-flick">
+                    <div class="reasons-grid">
+                        <div class="reason-card">
+                            <h4>Speed is Everything.</h4>
+                            <p>Pumps hit quick. Be the first in.</p>
+                        </div>
+                        <div class="reason-card">
+                            <h4>Practice Makes Perfect</h4>
+                            <p>Practice fast tx's on viral/tracker plays.</p>
+                        </div>
+                        <div class="reason-card">
+                            <h4>Be First, or be Last</h4>
+                            <p>Every click counts. Train to win.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!--  Tips  -->
+                <div class="tips">
+                    <ul>
+                        <li>Speedrun—the Quick Buy.</li>
+                        <li>Be First, or be Last.</li>
+                        <li>Train—stay ahead.</li>
+                    </ul>
+                </div>
+
+                <!--  Footer Message  -->
+                <div class="footer-message">
+                    <h2>The only tool you will ever need.</h2>
+                    <p>Flick is free for everyone.</p>
+                    
+                    <div class="container">
+                        <div class="tips">
+                            <ul>
+                                <li>Official contract address—tba.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                <br>
+                <hr>
+                <br>
+                <br>
+                <div style="text-align: left">
+                    <span style="color: rgba(255, 255, 255, 0.85);">
+                        <a href="https://x.com/flicktrainer" target="_blank">Twitter</a>
+                    </span>
+                    <div style="text-align: right">
+                        <span style="color: rgba(255, 255, 255, 0.45);">Flick Trainer © All Rights Reserved.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!--  JavaScript for the game  -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game variables
+            let score = 0;
+            let hits = 0;
+            let misses = 0;
+            let timeLeft = 20;
+            let gameActive = false;
+            let gameInterval;
+            let targetInterval;
+            
+            // DOM Elements
+            const gameContainer = document.getElementById('gameContainer');
+            const startScreen = document.getElementById('startScreen');
+            const startButton = document.getElementById('startButton');
+            const scoreDisplay = document.getElementById('score');
+            const timeDisplay = document.getElementById('time');
+            const accuracyDisplay = document.getElementById('accuracy');
+            const hitsDisplay = document.getElementById('hits');
+            const missesDisplay = document.getElementById('misses');
+            const hud = document.querySelector('.hud');
+            
+            // Solana logo SVG (embedded directly)
+            const solanaLogo = '<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" style="width:12px;height:12px;vertical-align:middle;"><path d="M 93.94 42.63 L 69.76 18.32 C 68.99 17.54 67.99 17 66.91 16.78 C 65.83 16.56 64.71 16.67 63.69 17.09 L 32.16 30.97 C 31.57 31.22 31.05 31.61 30.65 32.1 C 30.25 32.59 29.98 33.17 29.87 33.78 C 29.76 34.4 29.82 35.04 30.03 35.63 C 30.24 36.22 30.6 36.75 31.07 37.17 L 54.16 60.46 C 54.95 61.26 55.97 61.8 57.07 62.01 C 58.17 62.22 59.31 62.08 60.34 61.62 L 91.87 47.78 C 92.47 47.52 93 47.13 93.4 46.63 C 93.8 46.14 94.08 45.55 94.19 44.93 C 94.3 44.31 94.24 43.67 94.03 43.08 C 93.82 42.49 93.46 41.96 92.98 41.54 L 93.94 42.63 Z" fill="#00ffbd"/><path d="M 93.94 70.13 L 69.76 45.72 C 68.99 44.94 67.99 44.39 66.91 44.18 C 65.83 43.96 64.71 44.06 63.69 44.48 L 32.16 58.36 C 31.57 58.61 31.05 59 30.65 59.49 C 30.25 59.99 29.98 60.57 29.87 61.18 C 29.76 61.8 29.82 62.44 30.03 63.03 C 30.24 63.62 30.6 64.15 31.07 64.57 L 54.16 87.86 C 54.95 88.65 55.97 89.19 57.07 89.41 C 58.17 89.62 59.31 89.48 60.34 89.01 L 91.87 75.17 C 92.47 74.92 93 74.52 93.4 74.03 C 93.8 73.54 94.08 72.95 94.19 72.33 C 94.3 71.71 94.24 71.07 94.03 70.48 C 93.82 69.89 93.46 69.36 92.98 68.94 L 93.94 70.13 Z" fill="#00ffbd"/><path d="M 31.07 92.35 L 54.16 115.76 C 54.95 116.55 55.97 117.1 57.07 117.31 C 58.17 117.52 59.31 117.38 60.34 116.91 L 91.87 102.92 C 92.47 102.67 93 102.27 93.4 101.78 C 93.8 101.29 94.08 100.7 94.19 100.08 C 94.3 99.46 94.24 98.82 94.03 98.23 C 93.82 97.64 93.46 97.11 92.98 96.69 L 68.8 72.42 C 68.02 71.65 67.03 71.1 65.95 70.89 C 64.87 70.67 63.76 70.78 62.73 71.2 L 31.2 85.15 C 30.61 85.4 30.09 85.79 29.69 86.28 C 29.29 86.77 29.02 87.36 28.91 87.97 C 28.8 88.59 28.85 89.23 29.07 89.82 C 29.28 90.41 29.63 90.93 30.11 91.35 L 31.07 92.35 Z" fill="#00ffbd"/></svg>';
+            
+            // Start game
+            startButton.addEventListener('click', startGame);
+            
+            // Handle clicks on game container
+            gameContainer.addEventListener('click', function(e) {
+                if (!gameActive) return;
+                
+                // Check if click was on a target
+                if (e.target.classList.contains('target-button') || 
+                    e.target.parentElement.classList.contains('target-button')) {
+                    // Target hit
+                    let targetBtn = e.target.classList.contains('target-button') ? 
+                                   e.target : e.target.parentElement;
+                    targetHit(targetBtn);
+                } else {
+                    // Miss - clicked on game container but not on a target
+                    misses++;
+                    missesDisplay.textContent = misses;
+                    updateAccuracy();
+                }
+            });
+            
+            function startGame() {
+                // Reset game variables
+                score = 0;
+                hits = 0;
+                misses = 0;
+                timeLeft = 20;
+                gameActive = true;
+                
+                // Update UI
+                scoreDisplay.textContent = score;
+                timeDisplay.textContent = timeLeft;
+                accuracyDisplay.textContent = '0';
+                hitsDisplay.textContent = hits;
+                missesDisplay.textContent = misses;
+                
+                // Hide start screen
+                startScreen.style.display = 'none';
+                
+                // Show HUD
+                hud.style.display = 'flex';
+                
+                // Start spawning targets
+                targetInterval = setInterval(spawnTarget, 900);
+                
+                // Start timer
+                gameInterval = setInterval(updateGame, 1000);
+                
+                // Spawn first target immediately
+                spawnTarget();
+            }
+            
+            function updateGame() {
+                timeLeft--;
+                timeDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    endGame();
+                }
+            }
+            
+            function spawnTarget() {
+                if (!gameActive) return;
+                
+                // Create target button
+                const targetButton = document.createElement('button');
+                targetButton.className = 'target-button';
+                targetButton.innerHTML = `${solanaLogo} <span class="button-text">+5 SOL</span>`;
+                
+                // Position randomly within the game container
+                const gameWidth = gameContainer.offsetWidth - 100;
+                const gameHeight = gameContainer.offsetHeight - 36;
+                
+                const randomX = Math.floor(Math.random() * gameWidth);
+                const randomY = Math.floor(Math.random() * gameHeight);
+                
+                targetButton.style.left = `${randomX}px`;
+                targetButton.style.top = `${randomY}px`;
+                
+                // Add to game container
+                gameContainer.appendChild(targetButton);
+                
+                // Remove after a delay if not clicked
+                setTimeout(() => {
+                    if (targetButton.parentNode === gameContainer) {
+                        gameContainer.removeChild(targetButton);
+                    }
+                }, 1500);
+            }
+            
+            function targetHit(targetBtn) {
+                // Visual feedback
+                targetBtn.classList.add('clicked');
+                
+                // Create score popup
+                createScorePopup(targetBtn);
+                
+                // Update score
+                score += 5;
+                scoreDisplay.textContent = score;
+                
+                // Update hits
+                hits++;
+                hitsDisplay.textContent = hits;
+                
+                // Update accuracy
+                updateAccuracy();
+                
+                // Remove target
+                setTimeout(() => {
+                    if (targetBtn.parentNode === gameContainer) {
+                        gameContainer.removeChild(targetBtn);
+                    }
+                }, 200);
+            }
+            
+            function createScorePopup(targetBtn) {
+                const popup = document.createElement('div');
+                popup.className = 'score-popup';
+                popup.textContent = '+5 SOL';
+                popup.style.position = 'absolute';
+                popup.style.color = '#00ffbd';
+                popup.style.fontWeight = 'bold';
+                popup.style.left = `${parseInt(targetBtn.style.left) + 50}px`;
+                popup.style.top = `${parseInt(targetBtn.style.top)}px`;
+                
+                gameContainer.appendChild(popup);
+                
+                // Remove popup after animation completes
+                setTimeout(() => {
+                    if (popup.parentNode === gameContainer) {
+                        gameContainer.removeChild(popup);
+                    }
+                }, 1000);
+            }
+            
+            function updateAccuracy() {
+                if (hits + misses === 0) {
+                    accuracyDisplay.textContent = '0';
+                } else {
+                    const accuracy = Math.round((hits / (hits + misses)) * 100);
+                    accuracyDisplay.textContent = accuracy;
+                }
+            }
+            
+            function endGame() {
+                gameActive = false;
+                clearInterval(gameInterval);
+                clearInterval(targetInterval);
+                
+                // Remove any remaining targets
+                const targets = document.querySelectorAll('.target-button');
+                targets.forEach(target => target.remove());
+                
+                // Create game over screen
+                const gameOver = document.createElement('div');
+                gameOver.className = 'game-over';
+                gameOver.innerHTML = `
+                    <h1>Training Complete</h1>
+                    <h2>${score} SOL collected</h2>
+                    <hr>
+                    <p>Accuracy: ${accuracyDisplay.textContent}%</p>
+                    <p>Hits: ${hits}</p>
+                    <p>Misses: ${misses}</p>
+                    <br>
+                    <button class="start-button" id="restartButton">Train Again</button>
+                `;
+                
+                gameContainer.appendChild(gameOver);
+                
+                // Add restart button event listener
+                document.getElementById('restartButton').addEventListener('click', function() {
+                    gameOver.remove();
+                    startGame();
+                });
+            }
+            
+            // Noise canvas effect
+            const noiseCanvas = document.getElementById('noiseCanvas');
+            const ctx = noiseCanvas.getContext('2d');
+            
+            function resizeCanvas() {
+                noiseCanvas.width = window.innerWidth;
+                noiseCanvas.height = window.innerHeight;
+            }
+            
+            function drawNoise() {
+                const imageData = ctx.createImageData(noiseCanvas.width, noiseCanvas.height);
+                const data = imageData.data;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    const noise = Math.random() * 20;
+                    data[i] = noise;        // red
+                    data[i + 1] = noise;    // green
+                    data[i + 2] = noise;    // blue
+                    data[i + 3] = Math.random() * 20; // alpha
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                requestAnimationFrame(drawNoise);
+            }
+            
+            // Initialize noise canvas
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+            drawNoise();
+        });
+    </script>
+</body>
+</html> 
